@@ -1,0 +1,10 @@
+<Solution>
+    <Folder Name="/common/">
+        <File Path=".gitignore"/>
+        <File Path="Directory.Packages.props"/>
+        <File Path="Directory.Build.props"/>
+    </Folder>
+    <Folder Name="/src/">
+        <Project Path="src/Simple-AST-Interpreter/Simple-AST-Interpreter.csproj"/>
+    </Folder>
+</Solution>
