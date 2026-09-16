@@ -17,4 +17,6 @@ public interface INodeVisitor
     void Visit(SequenceStatement node);
 
     void Visit(WriteStatement node);
+
+    void Visit(ReadStatement node);
 }

@@ -57,4 +57,10 @@ public sealed class NodeVisitor : INodeVisitor
         long result = node.Expression.Accept(this);
         Console.WriteLine(result);
     }
+
+    public void Visit(ReadStatement node)
+    {
+        long value = long.Parse(Console.ReadLine()!);   
+        Values[node.Identifier] = value;
+    }
 }

@@ -29,20 +29,22 @@ public sealed class AstJsonParser
             return new WriteStatement(ParseExpression(write));
         }
 
+        if (node.TryGetProperty("read", out JsonElement read))
+        {
+            string identifier = read.GetString() ?? throw new ArgumentException("Read identifier cannot be null");
+
+            return new ReadStatement(identifier);
+        }
+
         if (node.TryGetProperty("assn", out JsonElement assignment))
         {
             string identifier = assignment
                 .GetProperty("dst")
                 .GetString()!;
 
-            IExpression expression = ParseExpression(
-                assignment.GetProperty("src")
-            );
+            IExpression expression = ParseExpression(assignment.GetProperty("src"));
 
-            return new AssignmentStatement(
-                identifier,
-                expression
-            );
+            return new AssignmentStatement(identifier, expression);
         }
 
         throw new ArgumentException("Unknown statement");
@@ -52,9 +54,7 @@ public sealed class AstJsonParser
     {
         if (node.TryGetProperty("const", out JsonElement constant))
         {
-            return new ConstantExpression(
-                constant.GetInt64()
-            );
+            return new ConstantExpression(constant.GetInt64());
         }
 
         if (node.TryGetProperty("var", out JsonElement identifier))
