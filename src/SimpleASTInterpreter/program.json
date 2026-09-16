@@ -1,0 +1,50 @@
+﻿{
+  "seq": {
+    "left": {
+      "assn": {
+        "dst": "a",
+        "src": {
+          "binop": "+",
+          "left": { "const": 2 },
+          "right": { "const": 2 }
+        }
+      }
+    },
+    "right": {
+      "seq": {
+        "left": {
+          "write": {
+            "binop": ">",
+            "left": {
+              "binop": "+",
+              "left": { "var": "a" },
+              "right": { "const": 1 }
+            },
+            "right": {
+              "binop": "-",
+              "left": { "var": "a" },
+              "right": { "const": 1 }
+            }
+          }
+        },
+        "right": {
+          "seq": {
+            "left": { "assn": { "dst": "b", "src": { "const": 3 } } },
+            "right": {
+              "seq": {
+                "left": { "write": { "var": "b" } },
+                "right": {
+                  "write": {
+                    "binop": "+",
+                    "left": { "var": "a" },
+                    "right": { "var": "b" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
