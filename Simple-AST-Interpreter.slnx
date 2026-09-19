@@ -5,7 +5,7 @@
         <File Path="Directory.Build.props" />
     </Folder>
     <Folder Name="/src/">
-        <Project Path="src/SimpleASTInterpretator.Core/SimpleASTInterpretator.Core.csproj" />
         <Project Path="src/SimpleASTInterpreter/SimpleASTInterpreter.csproj" />
+        <Project Path="src\SimpleASTInterpreter.Core\SimpleASTInterpreter.Core.csproj" />
     </Folder>
 </Solution>

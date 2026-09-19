@@ -6,7 +6,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\SimpleASTInterpretator.Core\SimpleASTInterpretator.Core.csproj" />
+      <ProjectReference Include="..\SimpleASTInterpreter.Core\SimpleASTInterpreter.Core.csproj" />
     </ItemGroup>
 
     <ItemGroup>

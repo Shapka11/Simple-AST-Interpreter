@@ -1,6 +1,6 @@
-﻿using SimpleASTInterpretator.Core.Visitor;
+﻿using SimpleASTInterpreter.Core.Visitor;
 
-namespace SimpleASTInterpretator.Core.Ast.Statements;
+namespace SimpleASTInterpreter.Core.Ast.Statements;
 
 public sealed class SequenceStatement : IStatement
 {

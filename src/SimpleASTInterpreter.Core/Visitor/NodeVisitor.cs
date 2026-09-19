@@ -1,14 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
-using SimpleASTInterpretator.Core.Ast.Expressions;
-using SimpleASTInterpretator.Core.Ast.Statements;
-using SimpleASTInterpretator.Core.Evaluators;
+using SimpleASTInterpreter.Core.Ast.Expressions;
+using SimpleASTInterpreter.Core.Ast.Statements;
+using SimpleASTInterpreter.Core.Evaluators;
 
-namespace SimpleASTInterpretator.Core.Visitor;
+namespace SimpleASTInterpreter.Core.Visitor;
 
 public sealed class NodeVisitor : INodeVisitor
 {
-    private IEvaluator _evaluator;
+    private readonly IEvaluator _evaluator;
 
     public NodeVisitor(Dictionary<string, long> values, IEvaluator evaluator)
     {
@@ -62,5 +62,30 @@ public sealed class NodeVisitor : INodeVisitor
     {
         long value = long.Parse(Console.ReadLine()!);   
         Values[node.Identifier] = value;
+    }
+
+    public void Visit(IfStatement node)
+    {
+        if (node.Condition.Accept(this) != 0)
+        {
+            node.Then.Accept(this);
+        }
+        else
+        {
+            node.Else.Accept(this);
+        }
+    }
+
+    public void Visit(SkipStatement node)
+    {
+    }
+
+    public void Visit(WhileStatement node)
+    {
+        if (node.Condition.Accept(this) != 0)
+        {
+            node.Body.Accept(this);
+            node.Accept(this);
+        }
     }
 }

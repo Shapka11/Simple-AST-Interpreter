@@ -1,6 +1,6 @@
-﻿using SimpleASTInterpretator.Core.Visitor;
+﻿using SimpleASTInterpreter.Core.Visitor;
 
-namespace SimpleASTInterpretator.Core.Ast.Expressions;
+namespace SimpleASTInterpreter.Core.Ast.Expressions;
 
 public sealed class ConstantExpression : IExpression
 {

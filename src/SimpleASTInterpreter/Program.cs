@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.IO;
-using SimpleASTInterpretator.Core.Ast.Statements;
-using SimpleASTInterpretator.Core.Evaluators;
-using SimpleASTInterpretator.Core.Parsing;
-using SimpleASTInterpretator.Core.Visitor;
+using SimpleASTInterpreter.Core.Ast.Statements;
+using SimpleASTInterpreter.Core.Evaluators;
+using SimpleASTInterpreter.Core.Parsing;
+using SimpleASTInterpreter.Core.Visitor;
 
 string json = File.ReadAllText("program.json");
 

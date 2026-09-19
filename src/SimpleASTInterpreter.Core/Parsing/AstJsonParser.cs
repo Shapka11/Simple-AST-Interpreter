@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Text.Json;
-using SimpleASTInterpretator.Core.Ast.Expressions;
-using SimpleASTInterpretator.Core.Ast.Statements;
+using SimpleASTInterpreter.Core.Ast.Expressions;
+using SimpleASTInterpreter.Core.Ast.Statements;
 
-namespace SimpleASTInterpretator.Core.Parsing;
+namespace SimpleASTInterpreter.Core.Parsing;
 
 public sealed class AstJsonParser
 {
@@ -16,6 +16,16 @@ public sealed class AstJsonParser
 
     private IStatement ParseStatement(JsonElement node)
     {
+        if (node.ValueKind == JsonValueKind.String)
+        {
+            if (node.GetString() == "skip")
+            {
+                return new SkipStatement();
+            }
+
+            throw new ArgumentException($"Unknown statement: {node.GetString()}");
+        }
+
         if (node.TryGetProperty("seq", out JsonElement sequence))
         {
             return new SequenceStatement(
@@ -47,6 +57,30 @@ public sealed class AstJsonParser
             return new AssignmentStatement(identifier, expression);
         }
 
+        if (node.TryGetProperty("if", out JsonElement ifNode))
+        {
+            IExpression condition = ParseExpression(ifNode.GetProperty("cond"));
+
+            IStatement thenStmt = ParseStatement(ifNode.GetProperty("then"));
+
+            IStatement? elseStmt = null;
+            if (ifNode.TryGetProperty("else", out JsonElement elseElement))
+            {
+                elseStmt = ParseStatement(elseElement);
+            }
+
+            return new IfStatement(condition, thenStmt, elseStmt);
+        }
+        
+        if (node.TryGetProperty("while", out JsonElement whileNode))
+        {
+            IExpression condition = ParseExpression(whileNode.GetProperty("cond"));
+            
+            IStatement bodyStmt = ParseStatement(whileNode.GetProperty("body"));
+            
+            return new WhileStatement(condition, bodyStmt);
+        }
+
         throw new ArgumentException("Unknown statement");
     }
 
@@ -70,7 +104,7 @@ public sealed class AstJsonParser
                 ParseExpression(node.GetProperty("right"))
             );
         }
-
+        
         throw new ArgumentException("Unknown expression");
     }
 }

@@ -1,21 +1,11 @@
 ﻿using System;
 
-namespace SimpleASTInterpretator.Core.Evaluators;
+namespace SimpleASTInterpreter.Core.Evaluators;
 
 public sealed class BinaryOperationEvaluator : IEvaluator
 {
     public long Evaluate(long left, long right, string operation)
     {
-        if (operation == "+")
-        {
-            return left + right;
-        }
-
-        if (operation == "-")
-        {
-            return left - right;
-        }
-
         return operation switch
         {
             "+" => left + right,

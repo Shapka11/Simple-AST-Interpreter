@@ -1,4 +1,4 @@
-﻿namespace SimpleASTInterpretator.Core.Evaluators;
+﻿namespace SimpleASTInterpreter.Core.Evaluators;
 
 public interface IEvaluator
 {
