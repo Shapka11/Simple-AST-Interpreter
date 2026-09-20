@@ -9,7 +9,7 @@ public sealed class AstJsonParser
 {
     public IStatement Parse(string json)
     {
-        using JsonDocument document = JsonDocument.Parse(json);
+        using JsonDocument document = JsonDocument.Parse(json, new JsonDocumentOptions { MaxDepth = 512 });
 
         return ParseStatement(document.RootElement);
     }
@@ -79,6 +79,15 @@ public sealed class AstJsonParser
             IStatement bodyStmt = ParseStatement(whileNode.GetProperty("body"));
             
             return new WhileStatement(condition, bodyStmt);
+        }
+        
+        if (node.TryGetProperty("do", out JsonElement doWhileNode))
+        {
+            IStatement bodyStmt = ParseStatement(doWhileNode.GetProperty("body"));
+            
+            IExpression condition = ParseExpression(doWhileNode.GetProperty("cond"));
+            
+            return new DoWhileStatement(condition, bodyStmt);
         }
 
         throw new ArgumentException("Unknown statement");

@@ -25,4 +25,6 @@ public interface INodeVisitor
     void Visit(SkipStatement node);
     
     void Visit(WhileStatement node);
+    
+    void Visit(DoWhileStatement node);
 }

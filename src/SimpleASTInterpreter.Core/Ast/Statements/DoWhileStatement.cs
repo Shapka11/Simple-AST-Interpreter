@@ -3,9 +3,9 @@ using SimpleASTInterpreter.Core.Visitor;
 
 namespace SimpleASTInterpreter.Core.Ast.Statements;
 
-public sealed class WhileStatement : LoopStatement
+public sealed class DoWhileStatement : LoopStatement
 {
-    public WhileStatement(IExpression condition, IStatement body) : base(condition, body)
+    public DoWhileStatement(IExpression condition, IStatement body) : base(condition, body)
     {
     }
 

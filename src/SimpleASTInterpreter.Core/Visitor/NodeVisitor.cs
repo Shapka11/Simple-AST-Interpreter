@@ -82,10 +82,16 @@ public sealed class NodeVisitor : INodeVisitor
 
     public void Visit(WhileStatement node)
     {
-        if (node.Condition.Accept(this) != 0)
+        while (node.Condition.Accept(this) != 0)
         {
             node.Body.Accept(this);
-            node.Accept(this);
         }
+    }
+
+    public void Visit(DoWhileStatement node)
+    {
+        do {
+            node.Body.Accept(this);
+        } while (node.Condition.Accept(this) != 0);
     }
 }
