@@ -1,7 +1,6 @@
-using SimpleASTInterpreter.Instructions.Instructions;
 using SimpleASTInterpreter.Instructions.Visitor;
 
-namespace SimpleASTInterpreter.Instructions;
+namespace SimpleASTInterpreter.Instructions.Instructions;
 
 public sealed class BinopInstruction : IInstruction
 {

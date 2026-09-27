@@ -115,7 +115,7 @@ public sealed class StackMachineVisitor : IInstructionVisitor
 
         for (int i = 0; i < instructions.Count; i++)
         {
-            if (instructions[i] is LabelInstruction { Label: string label })
+            if (instructions[i] is LabelInstruction { Label: { } label })
             {
                 labels[label] = i;
             }

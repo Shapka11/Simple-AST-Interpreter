@@ -6,7 +6,7 @@ using SimpleASTInterpreter.Instructions.Visitor;
 
 string json = File.ReadAllText("instructions.json");
 
-IReadOnlyList<IInstruction> program = new InstructionParser().Parse(json);
+IReadOnlyList<IInstruction> program = InstructionParser.Parse(json);
 
 var visitor = new StackMachineVisitor(program);
 

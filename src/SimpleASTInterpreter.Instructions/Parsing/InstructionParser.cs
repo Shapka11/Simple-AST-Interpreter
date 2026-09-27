@@ -7,7 +7,7 @@ namespace SimpleASTInterpreter.Instructions.Parsing;
 
 public sealed class InstructionParser
 {
-    public IReadOnlyList<IInstruction> Parse(string json)
+    public static IReadOnlyList<IInstruction> Parse(string json)
     {
         using JsonDocument document = JsonDocument.Parse(json);
 
