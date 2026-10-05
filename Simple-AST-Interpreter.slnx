@@ -8,5 +8,6 @@
         <Project Path="src/SimpleASTInterpreter/SimpleASTInterpreter.csproj" />
         <Project Path="src\SimpleASTInterpreter.Core\SimpleASTInterpreter.Core.csproj" />
         <Project Path="src/SimpleASTInterpreter.Instructions/SimpleASTInterpreter.Instructions.csproj" />
+        <Project Path="src/SimpleAstProgramToInstructions/SimpleAstProgramToInstructions.csproj" />
     </Folder>
 </Solution>
