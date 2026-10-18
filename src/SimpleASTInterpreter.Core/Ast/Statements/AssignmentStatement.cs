@@ -1,4 +1,4 @@
-﻿using SimpleASTInterpreter.Core.Ast.Expressions;
+using SimpleASTInterpreter.Core.Ast.Expressions;
 using SimpleASTInterpreter.Core.Visitor;
 
 namespace SimpleASTInterpreter.Core.Ast.Statements;
@@ -15,5 +15,5 @@ public sealed class AssignmentStatement : IStatement
     
     public IExpression Expression { get; }
 
-    public void Accept(INodeVisitor visitor) => visitor.Visit(this);
+    public void Accept<TValue>(INodeVisitor<TValue> visitor) => visitor.Visit(this);
 }

@@ -1,4 +1,4 @@
-﻿using SimpleASTInterpreter.Core.Visitor;
+using SimpleASTInterpreter.Core.Visitor;
 
 namespace SimpleASTInterpreter.Core.Ast.Expressions;
 
@@ -17,5 +17,5 @@ public sealed class BinaryOperationExpression : IExpression
 
     public IExpression Right { get; }
 
-    public long Accept(INodeVisitor visitor) => visitor.Visit(this);
+    public TValue Accept<TValue>(INodeVisitor<TValue> visitor) => visitor.Visit(this);
 }

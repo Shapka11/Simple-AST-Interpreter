@@ -9,5 +9,5 @@ public sealed class WhileStatement : LoopStatement
     {
     }
 
-    public override void Accept(INodeVisitor visitor) => visitor.Visit(this);
+    public override void Accept<TValue>(INodeVisitor<TValue> visitor) => visitor.Visit(this);
 }

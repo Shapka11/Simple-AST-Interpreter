@@ -10,6 +10,6 @@ public sealed class ReadStatement : IStatement
     }
 
     public string Identifier { get; }
-    
-    public void Accept(INodeVisitor visitor) => visitor.Visit(this);
+
+    public void Accept<TValue>(INodeVisitor<TValue> visitor) => visitor.Visit(this);
 }

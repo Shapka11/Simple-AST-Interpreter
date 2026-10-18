@@ -1,4 +1,4 @@
-﻿using SimpleASTInterpreter.Core.Visitor;
+using SimpleASTInterpreter.Core.Visitor;
 
 namespace SimpleASTInterpreter.Core.Ast.Statements;
 
@@ -14,5 +14,5 @@ public sealed class SequenceStatement : IStatement
 
     public IStatement Right { get; }
 
-    public void Accept(INodeVisitor visitor) => visitor.Visit(this);
+    public void Accept<TValue>(INodeVisitor<TValue> visitor) => visitor.Visit(this);
 }

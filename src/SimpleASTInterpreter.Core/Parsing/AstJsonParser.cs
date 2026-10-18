@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Text.Json;
 using SimpleASTInterpreter.Core.Ast.Expressions;
 using SimpleASTInterpreter.Core.Ast.Statements;
@@ -95,14 +96,60 @@ public sealed class AstJsonParser
 
     private IExpression ParseExpression(JsonElement node)
     {
+        if (node.ValueKind != JsonValueKind.Object)
+        {
+            throw new ArgumentException("An expression must be a JSON object.");
+        }
+
         if (node.TryGetProperty("const", out JsonElement constant))
         {
             return new ConstantExpression(constant.GetInt64());
         }
 
+        if (node.TryGetProperty("string", out JsonElement text))
+        {
+            if (text.ValueKind != JsonValueKind.String)
+            {
+                throw new ArgumentException("The string expression must contain a JSON string.");
+            }
+
+            return new StringExpression(text.GetString()!);
+        }
+
         if (node.TryGetProperty("var", out JsonElement identifier))
         {
             return new IdentifierExpression(identifier.GetString()!);
+        }
+
+        if (node.TryGetProperty("array", out JsonElement array))
+        {
+            if (array.ValueKind != JsonValueKind.Array)
+            {
+                throw new ArgumentException("The array expression must contain a JSON array.");
+            }
+
+            List<IExpression> elements = new();
+            foreach (JsonElement element in array.EnumerateArray())
+            {
+                elements.Add(ParseExpression(element));
+            }
+
+            return new ArrayExpression(elements);
+        }
+
+        if (node.TryGetProperty("length", out JsonElement length))
+        {
+            return new LengthExpression(ParseExpression(length));
+        }
+
+        if (node.TryGetProperty("elem", out JsonElement elementExpression))
+        {
+            if (!node.TryGetProperty("index", out JsonElement index))
+            {
+                throw new ArgumentException("The elem expression must contain an index.");
+            }
+
+            return new IndexExpression(ParseExpression(elementExpression), ParseExpression(index));
         }
 
         if (node.TryGetProperty("binop", out JsonElement operation))

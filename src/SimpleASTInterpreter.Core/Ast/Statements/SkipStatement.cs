@@ -4,5 +4,5 @@ namespace SimpleASTInterpreter.Core.Ast.Statements;
 
 public sealed class SkipStatement : IStatement
 {
-    public void Accept(INodeVisitor visitor) => visitor.Visit(this);
+    public void Accept<TValue>(INodeVisitor<TValue> visitor) => visitor.Visit(this);
 }
