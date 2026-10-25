@@ -19,6 +19,8 @@ public interface INodeVisitor<TValue>
     TValue Visit(LengthExpression node) => throw new NotSupportedException("Length is not supported by this visitor.");
     TValue Visit(IndexExpression node) => throw new NotSupportedException("Indexing is not supported by this visitor.");
 
+    TValue Visit(SexpExpression node) => throw new NotSupportedException("S-expressions are not supported by this visitor.");
+
     void Visit(AssignmentStatement node);
     void Visit(SequenceStatement node);
     void Visit(WriteStatement node);

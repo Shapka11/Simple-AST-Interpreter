@@ -6,13 +6,13 @@ public abstract class RuntimeValue
 {
     public virtual long AsNumber() => throw new InvalidOperationException("Expected a number.");
 
-    public virtual int Length => throw new InvalidOperationException("Expected a string or an array.");
+    public virtual int Length => throw new InvalidOperationException("Expected a string, an array or an S-expression.");
 
     public virtual RuntimeValue GetElement(long index) =>
-        throw new InvalidOperationException("Expected a string or an array.");
+        throw new InvalidOperationException("Expected a string, an array or an S-expression.");
 
     public virtual void SetElement(long index, RuntimeValue value) =>
-        throw new InvalidOperationException("Only array elements can be assigned.");
+        throw new InvalidOperationException("Expected a string, an array or an S-expression.");
 
     protected static int CheckIndex(long index, int length)
     {

@@ -57,6 +57,26 @@ public sealed class InstructionJsonWriter : IInstructionVisitor
 
     public void Visit(JnzInstruction node) => WriteObject("JNZ", node.Label);
 
+    public void Visit(ArrayInstruction node) => WriteObject("ARRAY", node.Count);
+
+    public void Visit(StringInstruction node) => WriteObject("STRING", node.Value);
+
+    public void Visit(LengthInstruction node) => _writer.WriteStringValue("LENGTH");
+
+    public void Visit(ElemInstruction node) => _writer.WriteStringValue("ELEM");
+
+    public void Visit(SetInstruction node) => _writer.WriteStringValue("SET");
+
+    public void Visit(SexpInstruction node)
+    {
+        _writer.WriteStartObject();
+        _writer.WriteStartArray("SEXP");
+        _writer.WriteStringValue(node.Name);
+        _writer.WriteNumberValue(node.Count);
+        _writer.WriteEndArray();
+        _writer.WriteEndObject();
+    }
+
     private void WriteObject(string name, string value)
     {
         _writer.WriteStartObject();

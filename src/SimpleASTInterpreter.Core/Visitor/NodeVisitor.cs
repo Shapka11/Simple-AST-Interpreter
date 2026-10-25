@@ -3,13 +3,14 @@ using System.Collections.Generic;
 using SimpleASTInterpreter.Core.Ast.Expressions;
 using SimpleASTInterpreter.Core.Ast.Statements;
 using SimpleASTInterpreter.Core.Evaluators;
+using SimpleASTInterpreter.Core.Parsing;
 using SimpleASTInterpreter.Core.Values;
 
 namespace SimpleASTInterpreter.Core.Visitor;
 
 public sealed class NodeVisitor : INodeVisitor<RuntimeValue>
 {
-    private readonly IEvaluator _evaluator;
+    private readonly ValueOperationEvaluator _evaluator;
 
     public NodeVisitor(Dictionary<string, long> values, IEvaluator evaluator)
         : this(ConvertValues(values), evaluator)
@@ -19,7 +20,7 @@ public sealed class NodeVisitor : INodeVisitor<RuntimeValue>
     public NodeVisitor(Dictionary<string, RuntimeValue> values, IEvaluator evaluator)
     {
         Values = values ?? throw new ArgumentNullException(nameof(values));
-        _evaluator = evaluator ?? throw new ArgumentNullException(nameof(evaluator));
+        _evaluator = new ValueOperationEvaluator(evaluator);
     }
 
     public Dictionary<string, RuntimeValue> Values { get; }
@@ -29,26 +30,7 @@ public sealed class NodeVisitor : INodeVisitor<RuntimeValue>
         RuntimeValue left = node.Left.Accept(this);
         RuntimeValue right = node.Right.Accept(this);
 
-        if (left is NumberValue leftNumber && right is NumberValue rightNumber)
-        {
-            return new NumberValue(_evaluator.Evaluate(leftNumber.Value, rightNumber.Value, node.Operation));
-        }
-
-        if (node.Operation is "==" or "!=")
-        {
-            bool equal = left is StringValue leftText && right is StringValue rightText
-                ? leftText.Value == rightText.Value
-                : ReferenceEquals(left, right);
-            return new NumberValue((node.Operation == "==" ? equal : !equal) ? 1 : 0);
-        }
-
-        if (node.Operation == "+" && left is StringValue first && right is StringValue second)
-        {
-            return new StringValue(first.Value + second.Value);
-        }
-
-        throw new InvalidOperationException(
-            $"Operation '{node.Operation}' is not supported for {left.GetType().Name} and {right.GetType().Name}.");
+        return _evaluator.Evaluate(left, right, node.Operation);
     }
 
     public RuntimeValue Visit(ConstantExpression node) => new NumberValue(node.Value);
@@ -75,6 +57,17 @@ public sealed class NodeVisitor : INodeVisitor<RuntimeValue>
 
     public RuntimeValue Visit(LengthExpression node) => new NumberValue(node.Expression.Accept(this).Length);
 
+    public RuntimeValue Visit(SexpExpression node)
+    {
+        var arguments = new RuntimeValue[node.Arguments.Count];
+        for (var i = 0; i < arguments.Length; i++)
+        {
+            arguments[i] = node.Arguments[i].Accept(this);
+        }
+
+        return new SexpValue(node.Name, arguments);
+    }
+
     public RuntimeValue Visit(IndexExpression node)
     {
         var collection = node.Expression.Accept(this);
@@ -100,8 +93,8 @@ public sealed class NodeVisitor : INodeVisitor<RuntimeValue>
 
     public void Visit(WriteStatement node) => Console.WriteLine(node.Expression.Accept(this));
 
-    public void Visit(ReadStatement node) => Values[node.Identifier] = new NumberValue(long.Parse(Console.ReadLine()
-        ?? throw new InvalidOperationException("Unexpected end of input.")));
+    public void Visit(ReadStatement node) => Values[node.Identifier] = RuntimeValueParser.Parse(Console.ReadLine()
+        ?? throw new InvalidOperationException("Unexpected end of input."));
 
     public void Visit(IfStatement node)
     {

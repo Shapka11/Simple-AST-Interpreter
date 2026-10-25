@@ -58,6 +58,14 @@ public sealed class AstJsonParser
             return new AssignmentStatement(identifier, expression);
         }
 
+        if (node.TryGetProperty("set", out JsonElement set))
+        {
+            var destination = new IndexExpression(
+                ParseExpression(set.GetProperty("dst")),
+                ParseExpression(set.GetProperty("idx")));
+            return new ElementAssignmentStatement(destination, ParseExpression(set.GetProperty("value")));
+        }
+
         if (node.TryGetProperty("if", out JsonElement ifNode))
         {
             IExpression condition = ParseExpression(ifNode.GetProperty("cond"));
@@ -140,6 +148,17 @@ public sealed class AstJsonParser
         if (node.TryGetProperty("length", out JsonElement length))
         {
             return new LengthExpression(ParseExpression(length));
+        }
+
+        if (node.TryGetProperty("sexp", out JsonElement name))
+        {
+            List<IExpression> arguments = new();
+            foreach (JsonElement argument in node.GetProperty("args").EnumerateArray())
+            {
+                arguments.Add(ParseExpression(argument));
+            }
+
+            return new SexpExpression(name.GetString()!, arguments);
         }
 
         if (node.TryGetProperty("elem", out JsonElement elementExpression))

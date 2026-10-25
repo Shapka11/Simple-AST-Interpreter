@@ -42,6 +42,57 @@ public sealed class CodeGenerator : INodeVisitor
         _instructions.Add(new StInstruction(node.Identifier));
     }
 
+    public long Visit(StringExpression node)
+    {
+        _instructions.Add(new StringInstruction(node.Value));
+        return 0;
+    }
+
+    public long Visit(ArrayExpression node)
+    {
+        foreach (IExpression element in node.Elements)
+        {
+            element.Accept(this);
+        }
+
+        _instructions.Add(new ArrayInstruction(node.Elements.Count));
+        return 0;
+    }
+
+    public long Visit(LengthExpression node)
+    {
+        node.Expression.Accept(this);
+        _instructions.Add(new LengthInstruction());
+        return 0;
+    }
+
+    public long Visit(IndexExpression node)
+    {
+        node.Expression.Accept(this);
+        node.Index.Accept(this);
+        _instructions.Add(new ElemInstruction());
+        return 0;
+    }
+
+    public long Visit(SexpExpression node)
+    {
+        foreach (IExpression argument in node.Arguments)
+        {
+            argument.Accept(this);
+        }
+
+        _instructions.Add(new SexpInstruction(node.Name, node.Arguments.Count));
+        return 0;
+    }
+
+    public void Visit(ElementAssignmentStatement node)
+    {
+        node.Destination.Expression.Accept(this);
+        node.Destination.Index.Accept(this);
+        node.Expression.Accept(this);
+        _instructions.Add(new SetInstruction());
+    }
+
     public void Visit(SequenceStatement node)
     {
         node.Left.Accept(this);

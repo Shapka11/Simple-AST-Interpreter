@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using SimpleASTInterpreter.Core.Evaluators;
+using SimpleASTInterpreter.Core.Parsing;
+using SimpleASTInterpreter.Core.Values;
 using SimpleASTInterpreter.Instructions.Instructions;
 
 namespace SimpleASTInterpreter.Instructions.Visitor;
@@ -9,9 +11,9 @@ public sealed class StackMachineVisitor : IInstructionVisitor
 {
     private readonly IReadOnlyList<IInstruction> _instructions;
     private readonly Dictionary<string, int> _labels;
-    private readonly Stack<long> _stack = new();
-    private readonly Dictionary<string, long> _variables = new();
-    private readonly BinaryOperationEvaluator _evaluator = new();
+    private readonly Stack<RuntimeValue> _stack = new();
+    private readonly Dictionary<string, RuntimeValue> _variables = new();
+    private readonly ValueOperationEvaluator _evaluator = new(new BinaryOperationEvaluator());
 
     private int _ip;
     private int _nextIp;
@@ -38,7 +40,8 @@ public sealed class StackMachineVisitor : IInstructionVisitor
 
     public void Visit(ReadInstruction node)
     {
-        _stack.Push(long.Parse(Console.ReadLine()!));
+        _stack.Push(RuntimeValueParser.Parse(Console.ReadLine()
+            ?? throw new InvalidOperationException("Unexpected end of input.")));
     }
 
     public void Visit(WriteInstruction node)
@@ -48,7 +51,7 @@ public sealed class StackMachineVisitor : IInstructionVisitor
 
     public void Visit(LdInstruction node)
     {
-        if (_variables.TryGetValue(node.Identifier, out long value) is false)
+        if (_variables.TryGetValue(node.Identifier, out RuntimeValue? value) is false)
         {
             throw new ArgumentException($"Unknown identifier {node.Identifier}");
         }
@@ -63,13 +66,13 @@ public sealed class StackMachineVisitor : IInstructionVisitor
 
     public void Visit(ConstInstruction node)
     {
-        _stack.Push(node.Value);
+        _stack.Push(new NumberValue(node.Value));
     }
 
     public void Visit(BinopInstruction node)
     {
-        long right = _stack.Pop();
-        long left = _stack.Pop();
+        RuntimeValue right = _stack.Pop();
+        RuntimeValue left = _stack.Pop();
 
         _stack.Push(_evaluator.Evaluate(left, right, node.Operation));
     }
@@ -85,7 +88,7 @@ public sealed class StackMachineVisitor : IInstructionVisitor
 
     public void Visit(JzInstruction node)
     {
-        if (_stack.Pop() == 0)
+        if (_stack.Pop().AsNumber() == 0)
         {
             JumpTo(node.Label);
         }
@@ -93,10 +96,49 @@ public sealed class StackMachineVisitor : IInstructionVisitor
 
     public void Visit(JnzInstruction node)
     {
-        if (_stack.Pop() != 0)
+        if (_stack.Pop().AsNumber() != 0)
         {
             JumpTo(node.Label);
         }
+    }
+
+    public void Visit(ArrayInstruction node) => _stack.Push(new ArrayValue(PopElements(node.Count)));
+
+    public void Visit(StringInstruction node) => _stack.Push(new StringValue(node.Value));
+
+    public void Visit(LengthInstruction node) => _stack.Push(new NumberValue(_stack.Pop().Length));
+
+    public void Visit(ElemInstruction node)
+    {
+        long index = _stack.Pop().AsNumber();
+        RuntimeValue collection = _stack.Pop();
+        _stack.Push(collection.GetElement(index));
+    }
+
+    public void Visit(SetInstruction node)
+    {
+        RuntimeValue value = _stack.Pop();
+        long index = _stack.Pop().AsNumber();
+        RuntimeValue collection = _stack.Pop();
+        collection.SetElement(index, value);
+    }
+
+    public void Visit(SexpInstruction node) => _stack.Push(new SexpValue(node.Name, PopElements(node.Count)));
+
+    private RuntimeValue[] PopElements(int count)
+    {
+        if (_stack.Count < count)
+        {
+            throw new InvalidOperationException("Not enough values on the stack.");
+        }
+
+        var elements = new RuntimeValue[count];
+        for (int i = count - 1; i >= 0; i--)
+        {
+            elements[i] = _stack.Pop();
+        }
+
+        return elements;
     }
 
     private void JumpTo(string label)
@@ -117,7 +159,10 @@ public sealed class StackMachineVisitor : IInstructionVisitor
         {
             if (instructions[i] is LabelInstruction { Label: { } label })
             {
-                labels[label] = i;
+                if (!labels.TryAdd(label, i))
+                {
+                    throw new ArgumentException($"Duplicate label {label}");
+                }
             }
         }
 

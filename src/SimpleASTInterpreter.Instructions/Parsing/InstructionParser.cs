@@ -37,11 +37,36 @@ public sealed class InstructionParser
                 return new WriteInstruction();
             }
 
+            if (token == "LENGTH")
+            {
+                return new LengthInstruction();
+            }
+
+            if (token == "ELEM")
+            {
+                return new ElemInstruction();
+            }
+
+            if (token == "SET")
+            {
+                return new SetInstruction();
+            }
+
             throw new ArgumentException($"Unknown instruction: {token}");
         }
 
         JsonElement.ObjectEnumerator enumerator = element.EnumerateObject();
+        if (!enumerator.MoveNext())
+        {
+            throw new ArgumentException("An instruction object must contain one property.");
+        }
+
         JsonProperty property = enumerator.Current;
+        if (enumerator.MoveNext())
+        {
+            throw new ArgumentException("An instruction object must contain one property.");
+        }
+
         string name = property.Name;
 
         if (name == "CONST")
@@ -82,6 +107,27 @@ public sealed class InstructionParser
         if (name == "JNZ")
         {
             return new JnzInstruction(property.Value.GetString()!);
+        }
+
+        if (name == "ARRAY")
+        {
+            return new ArrayInstruction(property.Value.GetInt32());
+        }
+
+        if (name == "STRING")
+        {
+            return new StringInstruction(property.Value.GetString()!);
+        }
+
+        if (name == "SEXP")
+        {
+            JsonElement arguments = property.Value;
+            if (arguments.ValueKind != JsonValueKind.Array || arguments.GetArrayLength() != 2)
+            {
+                throw new ArgumentException("SEXP must contain a name and an argument count.");
+            }
+
+            return new SexpInstruction(arguments[0].GetString()!, arguments[1].GetInt32());
         }
 
         throw new ArgumentException($"Unknown instruction: {name}");

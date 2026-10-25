@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text.Json;
 
 namespace SimpleASTInterpreter.Core.Values;
 
@@ -28,9 +27,7 @@ public sealed class ArrayValue : RuntimeValue
         var elements = new string[_elements.Length];
         for (var i = 0; i < _elements.Length; i++)
         {
-            elements[i] = _elements[i] is StringValue text
-                ? JsonSerializer.Serialize(text.Value)
-                : _elements[i].ToString()!;
+            elements[i] = _elements[i].ToString()!;
         }
 
         return "[" + string.Join(", ", elements) + "]";
